@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="styles.css">
+
+    <title>Password Setting</title>
+
+</head>
+
+
+<div class="container glass">
+    <h2>Password Test</h2>
+    <p>How secure is your Password?</p>
+    <form id="passwordForm">
+        <label for="newPassword"  style="color:black">Enter your Password</label>
+        <input type="password" id="newPassword" name="newPassword" required  style="margin-bottom:18px">
+        <div class="strength" id="strengthMessage" style="font-size:30px">Strength: <span id="strengthLevel">Weak</span></div>
+
+       <!--<label for="confirmPassword"  style="color:black">Confirm Password</label>-->
+       <!-- <input type="password" id="confirmPassword" name="confirmPassword" required>-->
+        <div class="error" id="errorMessage"></div> 
+
+    </form>
+</div>
+<style> 
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+          
+            border-radius: 8px;
+        }
+
+        h1 {
+            color: black;
+        }
+
+        p {
+           color:black;
+            font-size: 1.1em;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .buttons button {
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 1em;
+            color: black;
+            background-color: #00FAFA;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        </style>
+
+<script>
+    const newPassword = document.getElementById("newPassword");
+    const confirmPassword = document.getElementById("confirmPassword");
+    const strengthMessage = document.getElementById("strengthMessage");
+    const strengthLevel = document.getElementById("strengthLevel");
+    const errorMessage = document.getElementById("errorMessage");
+    const submitButton = document.getElementById("submitButton");
+
+    newPassword.addEventListener("input", updateStrength);
+    confirmPassword.addEventListener("input", checkMatch);
+
+    function updateStrength() {
+        const strength = calculateStrength(newPassword.value);
+        strengthLevel.textContent = strength;
+        strengthLevel.className = strength.toLowerCase();
+        checkMatch();
+    }
+
+    function calculateStrength(password) {
+        let strength = "Weak";
+        const hasLower = /[a-z]/.test(password);
+        const hasUpper = /[A-Z]/.test(password);
+        const hasNumber = /[0-9]/.test(password);
+        const hasSpecial = /[^a-zA-Z0-9]/.test(password);
+
+        if (password.length >= 8 && hasLower && hasUpper && hasNumber && hasSpecial) {
+            strength = "Strong";
+
+        } else if (password.length >= 6 && ((hasLower && hasUpper) || (hasNumber && hasSpecial))) {
+            strength = "Medium";
+        }
+        
+        return strength;
+    }
+
+    function checkMatch() {
+        if (newPassword.value !== confirmPassword.value) {
+            errorMessage.textContent = "Passwords do not match";
+            submitButton.disabled = true;
+        } else {
+            errorMessage.textContent = "";
+            submitButton.disabled = newPassword.value === "" || strengthLevel.textContent === "Weak";
+        }
+    }
+
+    document.getElementById("passwordForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+        if (newPassword.value === confirmPassword.value && strengthLevel.textContent !== "Weak") {
+            alert("Password has been set successfully!");
+            newPassword.value = "";
+            confirmPassword.value = "";
+            submitButton.disabled = true;
+        }
+    });
+</script>

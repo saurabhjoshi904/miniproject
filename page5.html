@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PassX - Your Personal Password Manager</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container glass">
+        <h1 style="color: black; font-size: 40px;"><pre>                                                                 Password Vault</pre></h1>
+        <p>We're thrilled to have you here. Your digital life contains a myriad of passwords, and we know how
+            challenging it can be to manage them all. That's why we're here to make it easy for you.</p>
+
+        <h2>Add a Password</h2>
+        <form id="passwordForm">
+            <label for="website" style="color: black">Website:</label>
+            <input type="text" id="website" name="website" required>
+            <br><br>
+
+            <label for="username" style="color: black">Username:</label>
+            <input type="text" id="username" name="username" required>
+            <br><br>
+
+            <label for="password" style="color: black">Password:</label>
+            <input type="password" id="password" name="password" required>
+            <br>
+
+            <button class="btn" type="submit">Submit</button>
+        </form>
+
+        <h2>Your Passwords <span id="alert">(Copied!)</span></h2>
+        <table>
+            <tr>
+                <th>Website</th>
+                <th>Username</th>
+                <th>Password</th>
+                <th>Delete</th>
+            </tr>
+        </table>
+    </div>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,700;1,300&family=Poppins:wght@300;400;600&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: 'Noto Sans', sans-serif;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        table, td, tr {
+            border: 2px solid black;
+            border-collapse: collapse;
+            padding: 5px 13px;
+        }
+
+        .container {
+            max-width: 80vw;
+            margin: 23px auto;
+        }
+
+        h1, h2, h3 {
+            margin: 23px 0;
+        }
+
+        .btn {
+            padding: 8px 17px;
+            background: black;
+            color: white;
+            font-weight: 900;
+            border: 2px solid gray;
+            border-radius: 8px;
+            margin: 25px 0;
+            cursor: pointer;
+        }
+
+        .btnsm {
+            padding: 8px 17px;
+            background: black;
+            color: white;
+            font-weight: 900;
+            border: 2px solid gray;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        img {
+            cursor: pointer;
+            position: relative;
+            bottom: 7px;
+            width: 15px;
+            height: 13px;
+        }
+
+        #alert {
+            display: none;
+        }
+    </style>
+
+    <script>
+        function maskPassword(pass) {
+            return "*".repeat(pass.length);
+        }
+
+        function copyText(txt) {
+            navigator.clipboard.writeText(txt).then(
+                () => {
+                    document.getElementById("alert").style.display = "inline";
+                    setTimeout(() => {
+                        document.getElementById("alert").style.display = "none";
+                    }, 2000);
+                },
+                () => {
+                    alert("Clipboard copying failed");
+                }
+            );
+        }
+
+        const deletePassword = (website) => {
+            let data = localStorage.getItem("passwords");
+            let arr = JSON.parse(data);
+            let arrUpdated = arr.filter((e) => e.website !== website);
+            localStorage.setItem("passwords", JSON.stringify(arrUpdated));
+            alert(`Successfully deleted ${website}'s password`);
+            showPasswords();
+        };
+
+        const showPasswords = () => {
+            let tb = document.querySelector("table");
+            let data = localStorage.getItem("passwords");
+
+            tb.innerHTML = `<tr>
+                <th>Website</th>
+                <th>Username</th>
+                <th>Password</th>
+                <th>Delete</th>
+            </tr>`;
+
+            if (data == null || JSON.parse(data).length == 0) {
+                tb.innerHTML += `<tr><td colspan="4">No Data To Show</td></tr>`;
+            } else {
+                let arr = JSON.parse(data);
+                arr.forEach((element) => {
+                    tb.innerHTML += `<tr>
+                        <td>${element.website} <img onclick="copyText('${element.website}')" src="./copy.svg"></td>
+                        <td>${element.username} <img onclick="copyText('${element.username}')" src="./copy.svg"></td>
+                        <td>${maskPassword(element.password)} <img onclick="copyText('${element.password}')" src="./copy.svg"></td>
+                        <td><button class="btnsm" onclick="deletePassword('${element.website}')">Delete</button></td>
+                    </tr>`;
+                });
+            }
+            document.getElementById("website").value = "";
+            document.getElementById("username").value = "";
+            document.getElementById("password").value = "";
+        };
+
+        document.querySelector(".btn").addEventListener("click", (e) => {
+            e.preventDefault();
+            let website = document.getElementById("website").value;
+            let username = document.getElementById("username").value;
+            let password = document.getElementById("password").value;
+
+            if (website && username && password) {
+                let passwords = localStorage.getItem("passwords");
+                let json = passwords ? JSON.parse(passwords) : [];
+                json.push({ website, username, password });
+                localStorage.setItem("passwords", JSON.stringify(json));
+                alert("Password Saved");
+                showPasswords();
+            }
+        });
+
+        // Display passwords on page load
+        showPasswords();
+    </script>
+</body>
+
+</html>

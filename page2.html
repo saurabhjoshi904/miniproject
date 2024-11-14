@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+       <link rel="stylesheet" href="styles.css">
+
+    <title>Password Generator</title>
+</head>
+<body>
+    <div class="container glass">
+        <h1>Password Generator</h1>
+
+        <div class="inputBox">
+            <input type="text" class="passBox" id="passBox" disabled>
+            <span class="material-icons" id="copyIcon">content_copy</span>
+        </div>
+
+        <input type="range" min="1" max="50" value="12" id="inputSlider">
+
+        <div class="length">
+            <p>Password Length</p>
+            <span id="sliderValue"></span>
+        </div>
+
+        <div class="row">
+            <label for="lowercase">Include Lowercase Letters (a-z)</label>
+            <input type="checkbox" name="lowercase" id="lowercase" checked>
+        </div>
+
+        <div class="row">
+            <label for="uppercase">Include Uppercase Letters (A-Z)</label>
+            <input type="checkbox" name="uppercase" id="uppercase">
+        </div>
+
+        <div class="row">
+            <label for="numbers">Include Numbers (0-9)</label>
+            <input type="checkbox" name="numbers" id="numbers">
+        </div>
+
+        <div class="row">
+            <label for="symbols">Include Symbols (@-*)</label>
+            <input type="checkbox" name="symbols" id="symbols">
+        </div>
+
+        <button type="button" class="genBtn" id="genBtn">Generate Password</button>
+        
+    </div>
+    <style>
+      
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+          
+            border-radius: 8px;
+        }
+
+        h1 {
+            color: black;
+        }
+
+        p {
+           
+           color:#2B4444;
+            font-size: 1.1em;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .buttons button {
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 1em;
+            color: #2B4444;
+            background-color: #00FAFA;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .buttons button:hover {
+            background-color: #45a049;
+        }
+    </style>
+
+
+
+    <script >
+      let inputSlider = document.getElementById('inputSlider');
+let sliderValue = document.getElementById('sliderValue');
+let passbox = document.getElementById('passBox');
+let lowercase = document.getElementById('lowercase');
+let uppercase = document.getElementById('uppercase');
+let numbers = document.getElementById('numbers');
+let symbols = document.getElementById('symbols');
+let genBtn = document.getElementById('genBtn');
+let copyIcon = document.getElementById("copyIcon");
+
+
+sliderValue.textContent = inputSlider.value;
+inputSlider.addEventListener('input', ()=>{
+    sliderValue.textContent = inputSlider.value;
+});
+
+// Ensure at least one checkbox is always checked
+const checkboxes = [lowercase, uppercase, numbers, symbols];
+checkboxes.forEach((checkbox) => {
+    checkbox.addEventListener('change', () => {
+        const checkedCount = checkboxes.filter(cb => cb.checked).length;
+        if (checkedCount === 0) {
+            lowercase.checked = true; // Recheck lowercase if all are unchecked
+        }
+    });
+});
+
+genBtn.addEventListener('click', ()=>{
+    passbox.value = generatePassword();
+});
+
+function generatePassword(){
+    let genPassword = "";
+    let length = inputSlider.value;
+    let characters = "";
+
+    // Add character types based on user selection
+    if (lowercase.checked) {
+        characters += "abcdefghijklmnopqrstuvwxyz";
+    }
+    if (uppercase.checked) {
+        characters += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    }
+    if (numbers.checked) {
+        characters += "0123456789";
+    }
+    if (symbols.checked) {
+        characters += "@-!*#$%&";
+    }
+
+    // Generate the password
+    for (let i = 0; i < length; i++) {
+        genPassword += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+
+    return genPassword;
+}
+
+
+copyIcon.addEventListener('click', () => {
+    // Copy password to clipboard
+    navigator.clipboard.writeText(passbox.value).then(() => {
+        // Provide feedback to user
+        alert('Password copied to clipboard!');
+    }).catch(err => {
+        console.error('Failed to copy password: ', err);
+        alert('Failed to copy password: ' + err);
+    });
+});
+    </script>
+</body>
+</html>
